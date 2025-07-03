@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/mcp",
+      "dest": "/server.ts",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/sse",
+      "dest": "/server.ts",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/messages",
+      "dest": "/server.ts",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/health",
+      "dest": "/server.ts",
+      "methods": ["GET"]
+    }
+  ]
+}
