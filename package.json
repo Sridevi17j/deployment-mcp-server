@@ -4,9 +4,10 @@
   "description": "MCP Server for multi-platform deployment orchestration",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node server.ts",
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod",
+    "local-info": "node local-dev.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["mcp", "deployment", "vercel", "render", "orchestration"],

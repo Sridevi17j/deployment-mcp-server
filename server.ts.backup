@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from "zod";
 import axios from "axios";
+import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Create Express app
 const app = express();
@@ -519,12 +520,8 @@ app.get("/health", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-// For Vercel serverless, export the app
-if (process.env.VERCEL) {
-  // Export for Vercel serverless
-  export default app;
-} else {
-  // Start server locally
+// For local development only
+if (!process.env.VERCEL && require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Deployment Orchestrator MCP Server running on port ${PORT}`);
     console.log(`📊 Streamable HTTP endpoint: http://localhost:${PORT}/mcp`);
