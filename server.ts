@@ -5,6 +5,10 @@ import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from "zod";
 import axios from "axios";
 
+// Create Express app
+const app = express();
+app.use(express.json());
+
 // Create an MCP server
 const server = new McpServer({
   name: "deployment-orchestrator",
@@ -407,9 +411,6 @@ Use these tools:
 );
 
 // Express + SSE setup for Streamable HTTP
-const app = express();
-app.use(express.json());
-
 const transports: { [sessionId: string]: SSEServerTransport } = {};
 
 // Create custom transport class with logging
@@ -443,7 +444,7 @@ class LoggingSSEServerTransport extends SSEServerTransport {
   }
 }
 
-// Streamable HTTP endpoint
+// Streamable HTTP endpoint (POST for MCP requests)
 app.post("/mcp", async (req, res) => {
   console.log("📡 Streamable HTTP request received");
   
@@ -456,6 +457,30 @@ app.post("/mcp", async (req, res) => {
     console.error("❌ Error handling Streamable HTTP request:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+// GET endpoint for browser testing
+app.get("/mcp", (req, res) => {
+  res.json({
+    message: "🚀 MCP Server is running!",
+    transport: "Streamable HTTP",
+    endpoints: {
+      "Streamable HTTP": "POST /mcp",
+      "Legacy SSE": "GET /sse",
+      "Health Check": "GET /health"
+    },
+    tools: [
+      "deploy-vercel",
+      "deploy-render", 
+      "check-deployment-status",
+      "list-services"
+    ],
+    prompts: [
+      "deploy-application",
+      "deployment-dashboard"
+    ],
+    usage: "Add to Claude Code: claude mcp add deployment-orchestrator http://localhost:3000/mcp"
+  });
 });
 
 // Legacy SSE support for backward compatibility
@@ -494,12 +519,19 @@ app.get("/health", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Deployment Orchestrator MCP Server running on port ${PORT}`);
-  console.log(`📊 Streamable HTTP endpoint: http://localhost:${PORT}/mcp`);
-  console.log(`📡 Legacy SSE endpoint: http://localhost:${PORT}/sse`);
-  console.log(`❤️  Health check: http://localhost:${PORT}/health`);
-  console.log(`\n🔧 Environment setup required:`);
-  console.log(`   export VERCEL_TOKEN=your_vercel_token`);
-  console.log(`   export RENDER_TOKEN=your_render_token`);
-});
+// For Vercel serverless, export the app
+if (process.env.VERCEL) {
+  // Export for Vercel serverless
+  export default app;
+} else {
+  // Start server locally
+  app.listen(PORT, () => {
+    console.log(`🚀 Deployment Orchestrator MCP Server running on port ${PORT}`);
+    console.log(`📊 Streamable HTTP endpoint: http://localhost:${PORT}/mcp`);
+    console.log(`📡 Legacy SSE endpoint: http://localhost:${PORT}/sse`);
+    console.log(`❤️  Health check: http://localhost:${PORT}/health`);
+    console.log(`\n🔧 Environment setup required:`);
+    console.log(`   export VERCEL_TOKEN=your_vercel_token`);
+    console.log(`   export RENDER_TOKEN=your_render_token`);
+  });
+}

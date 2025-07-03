@@ -1,31 +1,14 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "server.ts": {
+      "runtime": "nodejs18.x"
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/mcp",
-      "dest": "/server.ts",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/sse",
-      "dest": "/server.ts",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/messages",
-      "dest": "/server.ts",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/health",
-      "dest": "/server.ts",
-      "methods": ["GET"]
+      "src": "/(.*)",
+      "dest": "/server.ts"
     }
   ]
 }
